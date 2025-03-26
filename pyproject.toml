@@ -14,3 +14,6 @@ multi_line_output = 3
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-v --cov=cmake2graph"
+pythonpath = [
+  "."
+]

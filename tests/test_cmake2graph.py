@@ -1,6 +1,7 @@
 import os
 import pytest
 import networkx as nx
+
 from cmake2graph.cli import (
     parse_cmake_file,
     build_dependency_graph,
