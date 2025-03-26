@@ -1,6 +1,7 @@
 import pytest
 import networkx as nx
 
+
 @pytest.fixture
 def sample_graph():
     graph = nx.DiGraph()
@@ -12,6 +13,7 @@ def sample_graph():
         ("math_tests", "math")
     ])
     return graph
+
 
 @pytest.fixture
 def complex_graph():
@@ -27,6 +29,7 @@ def complex_graph():
         ("math", "external2")
     ])
     return graph
+
 
 @pytest.fixture
 def cmake_content():

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 # Description: Visualize CMake target dependencies as a directed graph.
-# Usage: python cmake2graph.py /path/to/cpp-cmake-project
-# python cmake2graph.py /path/to/cpp-cmake-project --output graph.png --target my_target --depth 2 
+# Usage: python cmake2graph /path/to/cpp-cmake-project
+# cmake2graph /path/to/cpp-cmake-project --output graph.png --target my_target
 
 import os
 import argparse
-import networkx as nx # type: ignore
-import matplotlib.pyplot as plt # type: ignore
+import networkx as nx
+import matplotlib.pyplot as plt
 
 
 def parse_cmake_file(cmake_file):
@@ -19,15 +19,18 @@ def parse_cmake_file(cmake_file):
     """
     targets = set()
     dependencies = {}
-    
+
     with open(cmake_file, 'r') as f:
         content = f.read()
         # Remove comments and join line continuations
-        content = ' '.join(line.split('#')[0].strip() for line in content.splitlines())
-        
+        content = ' '.join(
+            line.split('#')[0].strip()
+            for line in content.splitlines()
+        )
+
         # Split by commands while preserving parentheses content
         commands = content.replace('(', ' ( ').replace(')', ' ) ').split()
-        
+
         i = 0
         while i < len(commands):
             cmd = commands[i].lower()
@@ -49,24 +52,27 @@ def parse_cmake_file(cmake_file):
                     deps = commands[start + 2:end]
                     if target not in dependencies:
                         dependencies[target] = []
-                    dependencies[target].extend(d for d in deps if d != 'PUBLIC' and d != 'PRIVATE')
+                    dependencies[target].extend(
+                        d for d in deps if d != 'PUBLIC' and d != 'PRIVATE'
+                    )
                 except (ValueError, IndexError):
                     pass
                 i = end + 1 if 'end' in locals() else i + 1
             else:
                 i += 1
-                
+
     return targets, dependencies
+
 
 def build_dependency_graph(cmake_dir):
     """
-    Build a directed graph of dependencies from CMake files in the given directory,
-    including nested directories.
+    Build a directed graph of dependencies from CMake files in the
+    given directory, including nested directories.
     """
     graph = nx.DiGraph()
     all_targets = set()
     all_dependencies = {}
-    
+
     # First pass: collect all targets
     for root, _, files in os.walk(cmake_dir):
         for file in files:
@@ -78,32 +84,35 @@ def build_dependency_graph(cmake_dir):
                     if target not in all_dependencies:
                         all_dependencies[target] = []
                     all_dependencies[target].extend(dependencies)
-    
+
     # Second pass: build graph with verified targets
     for target in all_targets:
         graph.add_node(target)
-    
+
     for target, deps in all_dependencies.items():
         if target in all_targets:  # Only add edges for known targets
             for dep in deps:
                 graph.add_edge(target, dep)
-    
+
     return graph
+
 
 def filter_graph_by_target(graph, target, max_depth=None):
     """
-    Filter the graph to include only the specified target and its dependencies up to a given depth.
+    Filter the graph to include only the specified target
+    and its dependencies up to a given depth.
     """
     if target not in graph:
         raise ValueError(f"Target '{target}' not found in the graph.")
-    
+
     filtered_graph = nx.DiGraph()
     nodes_to_visit = [(target, 0)]  # (node, current_depth)
     visited = set()
 
     while nodes_to_visit:
         current_node, current_depth = nodes_to_visit.pop(0)
-        if current_node in visited or (max_depth is not None and current_depth > max_depth):
+        if (current_node in visited or
+                (max_depth is not None and current_depth > max_depth)):
             continue
         visited.add(current_node)
         for neighbor in graph.successors(current_node):
@@ -112,48 +121,52 @@ def filter_graph_by_target(graph, target, max_depth=None):
 
     return filtered_graph
 
+
 def exclude_external_dependencies(graph, cmake_targets):
     """
-    Exclude nodes from the graph that are not part of the CMake project targets.
+    Exclude nodes from the graph that are not part of the
+    CMake project targets.
     """
     external_nodes = [node for node in graph if node not in cmake_targets]
     graph.remove_nodes_from(external_nodes)
 
+
 def visualize_graph(graph, output_file=None):
     """
-    Visualize the dependency graph using matplotlib with improved layout and styling.
-    Optionally save the graph to a file.
+    Visualize the dependency graph using matplotlib with improved
+    layout and styling. Optionally save the graph to a file.
     """
     plt.figure(figsize=(12, 8))  # Larger figure size
 
     pos = nx.planar_layout(graph, scale=2)
 
     # print(graph.nodes)
-    # print(dict(enumerate(nx.bfs_layers(graph, ["app", "core_tests", "math_tests"]))))
+    # print(dict(enumerate(nx.bfs_layers(graph,
+    # ["app", "core_tests", "math_tests"]))))
     # pos = nx.bfs_layout(graph, ["app", "math_tests", "core_tests"])
 
     # Draw edges with arrows
-    nx.draw_networkx_edges(graph, pos, 
-                          edge_color='black',
-                          arrows=True,
-                          arrowsize=20,
-                          width=1.5,
-                          alpha=1,
-                          node_size=3000)
+    nx.draw_networkx_edges(graph, pos,
+                           edge_color='black',
+                           arrows=True,
+                           arrowsize=20,
+                           width=1.5,
+                           alpha=1,
+                           node_size=3000)
 
     # Draw nodes
     nx.draw_networkx_nodes(graph, pos,
-                          node_color='lightblue',
-                          node_size=3000,
-                          alpha=0.4,
-                          linewidths=1,
-                          edgecolors='darkblue')
+                           node_color='lightblue',
+                           node_size=3000,
+                           alpha=0.4,
+                           linewidths=1,
+                           edgecolors='darkblue')
 
     # Draw labels with slight offset for better visibility
     nx.draw_networkx_labels(graph, pos,
-                           font_size=10,
-                           font_weight='bold',
-                           font_family='sans-serif')
+                            font_size=10,
+                            font_weight='bold',
+                            font_family='sans-serif')
 
     plt.title("CMake Target Dependencies", pad=20, fontsize=14)
     plt.axis('off')  # Hide axes
@@ -168,13 +181,20 @@ def visualize_graph(graph, output_file=None):
 
     plt.close()  # Clean up the figure
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Visualize CMake target dependencies as a directed graph.")
-    parser.add_argument("cmake_dir", help="Path to the directory containing CMakeLists.txt files.")
-    parser.add_argument("--output", help="Path to save the graph image (e.g., graph.png).")
-    parser.add_argument("--target", help="Target to visualize dependencies for.")
-    parser.add_argument("--depth", type=int, help="Maximum depth of dependencies to include.")
-    parser.add_argument("--exclude-external", action="store_true", help="Exclude external libraries from the graph.")
+    parser = argparse.ArgumentParser(description="Visualize CMake target "
+                                     "dependencies as a directed graph.")
+    parser.add_argument("cmake_dir", help="Path to the directory "
+                        "containing CMakeLists.txt files.")
+    parser.add_argument("--output", help="Path to save the graph image "
+                        "(e.g., graph.png).")
+    parser.add_argument("--target",
+                        help="Target to visualize dependencies for.")
+    parser.add_argument("--depth", type=int,
+                        help="Maximum depth of dependencies to include.")
+    parser.add_argument("--exclude-external", action="store_true",
+                        help="Exclude external libraries from the graph.")
     args = parser.parse_args()
 
     graph = build_dependency_graph(args.cmake_dir)
@@ -191,6 +211,7 @@ def main():
             return
 
     visualize_graph(graph, args.output)
+
 
 if __name__ == "__main__":
     main()
