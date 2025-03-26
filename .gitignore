@@ -1,0 +1,45 @@
+# Editors configs
+.vscode
+*.swp
+*.swo
+
+# Build directories
+build
+release
+debug
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Compiled Object files
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+
+# Compiled Static libraries
+*.a
+*.lib
+
+# Python binding
+nanobind_test.egg-info
+_skbuild
+/dist
+__pycache__
+.cache
+*.pyd
+*.egg-info
+pyenv
+
+# Misc
+wheels/
+.installed.cfg
+*.egg
+.env
+.venv
+env/
+venv/
+ENV/
