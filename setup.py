@@ -13,6 +13,12 @@ setup(
             "cmake2graph=cmake2graph.cli:main",
         ],
     },
+    extras_require={
+        "test": [
+            "pytest>=6.0",
+            "pytest-cov>=2.0",
+        ],
+    },
     author="Kenneth Assogba",
     author_email="kennethassogba@gmail.com",
     description="Visualize CMake target dependencies as a directed graph",

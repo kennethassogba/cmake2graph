@@ -109,7 +109,7 @@ def filter_graph_by_target(graph, target, max_depth=None):
         for neighbor in graph.successors(current_node):
             filtered_graph.add_edge(current_node, neighbor)
             nodes_to_visit.append((neighbor, current_depth + 1))
-    
+
     return filtered_graph
 
 def exclude_external_dependencies(graph, cmake_targets):
