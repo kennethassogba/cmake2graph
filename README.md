@@ -12,7 +12,8 @@ To install the package locally for development:
 
 ```bash
 cd cmake2graph
-# Create venv
+python3 -m venv .venv
+source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install flake8 pytest pytest-cov
 pip install -e .[test]
