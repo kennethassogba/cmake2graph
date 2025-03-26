@@ -12,7 +12,11 @@ To install the package locally for development:
 
 ```bash
 cd cmake2graph
-pip install -e .
+# Create venv
+python -m pip install --upgrade pip
+python -m pip install flake8 pytest pytest-cov
+pip install -e .[test]
+pytest --cov=cmake2graph # test
 ```
 
 ## Usage
@@ -21,6 +25,10 @@ pip install -e .
 cmake2graph /path/to/cpp-cmake-project
 cmake2graph /path/to/cpp-cmake-project --exclude-external --output graph.png --target my_target --depth 2
 ```
+
+Produces
+
+![Example](example.png)
 
 ## Features
 
