@@ -125,13 +125,13 @@ def visualize_graph(graph, output_file=None):
     Optionally save the graph to a file.
     """
     plt.figure(figsize=(12, 8))  # Larger figure size
-    
-    # pos = nx.planar_layout(graph, scale=2)
 
-    print(graph.nodes)
-    print(dict(enumerate(nx.bfs_layers(graph, ["app", "core_tests", "math_tests"]))))
-    pos = nx.bfs_layout(graph, ["app", "math_tests", "core_tests"])
-    
+    pos = nx.planar_layout(graph, scale=2)
+
+    # print(graph.nodes)
+    # print(dict(enumerate(nx.bfs_layers(graph, ["app", "core_tests", "math_tests"]))))
+    # pos = nx.bfs_layout(graph, ["app", "math_tests", "core_tests"])
+
     # Draw edges with arrows
     nx.draw_networkx_edges(graph, pos, 
                           edge_color='black',
@@ -140,7 +140,7 @@ def visualize_graph(graph, output_file=None):
                           width=1.5,
                           alpha=1,
                           node_size=3000)
-    
+
     # Draw nodes
     nx.draw_networkx_nodes(graph, pos,
                           node_color='lightblue',
@@ -148,24 +148,24 @@ def visualize_graph(graph, output_file=None):
                           alpha=0.4,
                           linewidths=1,
                           edgecolors='darkblue')
-    
+
     # Draw labels with slight offset for better visibility
     nx.draw_networkx_labels(graph, pos,
                            font_size=10,
                            font_weight='bold',
                            font_family='sans-serif')
-    
+
     plt.title("CMake Target Dependencies", pad=20, fontsize=14)
     plt.axis('off')  # Hide axes
-    
+
     # Add some padding around the graph
     plt.margins(0.2)
-    
+
     if output_file:
         plt.savefig(output_file, bbox_inches='tight', dpi=300)
     else:
         plt.show()
-    
+
     plt.close()  # Clean up the figure
 
 def main():
