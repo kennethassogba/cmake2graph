@@ -44,3 +44,4 @@ env/
 venv/
 ENV/
 .coverage
+.pytest_cache
